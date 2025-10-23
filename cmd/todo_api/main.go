@@ -3,16 +3,24 @@ package main
 import (
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
 
 	"github.com/Aytaditya/todo_api_golang/internal/config"
+	"github.com/Aytaditya/todo_api_golang/internal/storage/sqlite"
 )
 
 func main() {
 	fmt.Println("This is the main package for the todo_api command.")
 	cfg := config.MustLoad() // loading all the configurations from the config file (contains detail like port address, database path)
 
-	fmt.Println("server at address:", cfg.Address)
+	// DB CONNECTION HERE
+	_, er := sqlite.ConnectDB(cfg)
+	if er != nil {
+		log.Fatal("failed to connect to database:", er.Error())
+	}
+
+	slog.Info("Connected to the database successfully")
 
 	router := http.NewServeMux() // Create a new HTTP request multiplexer (router)
 
@@ -29,9 +37,9 @@ func main() {
 		Handler: router,
 	}
 
-	err := server.ListenAndServe()
-
 	fmt.Println("Server Running at:", cfg.HttpServer.Address)
+
+	err := server.ListenAndServe()
 
 	if err != nil {
 		log.Fatal(err.Error())
