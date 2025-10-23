@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/Aytaditya/todo_api_golang/internal/config"
 	_ "github.com/mattn/go-sqlite3"
@@ -44,4 +45,26 @@ func ConnectDB(cfg *config.Config) (*Sqlite, error) {
 
 	return &Sqlite{DB: db}, nil
 
+}
+
+func (s *Sqlite) CreateUser(username *string, email *string, password *string) (int64, error) {
+
+	if username == nil || email == nil || password == nil {
+		return 0, fmt.Errorf("username, email, and password must not be nil")
+	}
+	stmt, err := s.DB.Prepare("INSERT INTO users(username, email, password) VALUES (?, ?, ?)")
+	if err != nil {
+		return 0, err
+	}
+	res, err := stmt.Exec(*username, *email, *password)
+	stmt.Close()
+	if err != nil {
+		return 0, err
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }

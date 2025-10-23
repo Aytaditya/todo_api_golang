@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/Aytaditya/todo_api_golang/internal/config"
+	"github.com/Aytaditya/todo_api_golang/internal/http/auth"
 	"github.com/Aytaditya/todo_api_golang/internal/storage/sqlite"
 )
 
@@ -15,7 +16,7 @@ func main() {
 	cfg := config.MustLoad() // loading all the configurations from the config file (contains detail like port address, database path)
 
 	// DB CONNECTION HERE
-	_, er := sqlite.ConnectDB(cfg)
+	storage, er := sqlite.ConnectDB(cfg)
 	if er != nil {
 		log.Fatal("failed to connect to database:", er.Error())
 	}
@@ -28,6 +29,9 @@ func main() {
 	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Welcome to the Todo API"))
 	})
+
+	// router 2: Signup Router
+	router.HandleFunc("POST /api/signup", auth.Signup(storage))
 
 	// http.Server is a struct that represents an HTTP server. here we are creating an instance of http.Server with the specified address and handler (router).
 	// but we can also create a server using http.ListenAndServe directly without creating an instance of http.Server.
