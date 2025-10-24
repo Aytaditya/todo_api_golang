@@ -52,6 +52,9 @@ func (s *Sqlite) CreateUser(username *string, email *string, password *string) (
 	if username == nil || email == nil || password == nil {
 		return 0, fmt.Errorf("username, email, and password must not be nil")
 	}
+
+	// before adding password to db. hash it using bcrypt
+
 	stmt, err := s.DB.Prepare("INSERT INTO users(username, email, password) VALUES (?, ?, ?)")
 	if err != nil {
 		return 0, err
@@ -67,4 +70,35 @@ func (s *Sqlite) CreateUser(username *string, email *string, password *string) (
 	}
 
 	return id, nil
+}
+
+func (s *Sqlite) Login(email *string, password *string) (int64, error) {
+	if email == nil || password == nil {
+		return 0, fmt.Errorf("email and password must not be nil")
+	}
+
+	// we will get the password for the user
+	// if we only have one user we can use queryRow instead of prepare and exec
+	row := s.DB.QueryRow("SELECT id, password FROM users WHERE email = ?", *email)
+
+	var id int64
+	var dbPassword string
+
+	err := row.Scan(&id, &dbPassword)
+	if err == sql.ErrNoRows {
+		return 0, fmt.Errorf("no user found with the given email")
+	}
+	if err != nil {
+		return 0, err
+	}
+
+	fmt.Println("User ID:", id)
+	fmt.Println("Password:", dbPassword)
+
+	if dbPassword != *password {
+		return 0, fmt.Errorf("wrong password entered")
+	}
+
+	return id, nil
+
 }

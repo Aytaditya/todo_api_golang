@@ -33,6 +33,9 @@ func main() {
 	// router 2: Signup Router
 	router.HandleFunc("POST /api/signup", auth.Signup(storage))
 
+	// router 3: Login Router
+	router.HandleFunc("POST /api/login", auth.Login(storage))
+
 	// http.Server is a struct that represents an HTTP server. here we are creating an instance of http.Server with the specified address and handler (router).
 	// but we can also create a server using http.ListenAndServe directly without creating an instance of http.Server.
 	// but this gives us more control
