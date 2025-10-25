@@ -15,7 +15,7 @@ func main() {
 	fmt.Println("This is the main package for the todo_api command.")
 	cfg := config.MustLoad() // loading all the configurations from the config file (contains detail like port address, database path)
 
-	// DB CONNECTION HERE
+	// DB CONNECTION HERE (it is returning a db instance)
 	storage, er := sqlite.ConnectDB(cfg)
 	if er != nil {
 		log.Fatal("failed to connect to database:", er.Error())
@@ -30,11 +30,15 @@ func main() {
 		w.Write([]byte("Welcome to the Todo API"))
 	})
 
-	// router 2: Signup Router
+	// AUTH ROUTES
 	router.HandleFunc("POST /api/signup", auth.Signup(storage))
-
-	// router 3: Login Router
 	router.HandleFunc("POST /api/login", auth.Login(storage))
+
+	// NOTES ROUTES
+	// creating notes route
+	// view all notes of a user
+	// update a note
+	// delete a note
 
 	// http.Server is a struct that represents an HTTP server. here we are creating an instance of http.Server with the specified address and handler (router).
 	// but we can also create a server using http.ListenAndServe directly without creating an instance of http.Server.

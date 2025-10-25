@@ -6,6 +6,7 @@ import (
 
 	"github.com/Aytaditya/todo_api_golang/internal/config"
 	_ "github.com/mattn/go-sqlite3"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Sqlite struct {
@@ -54,12 +55,16 @@ func (s *Sqlite) CreateUser(username *string, email *string, password *string) (
 	}
 
 	// before adding password to db. hash it using bcrypt
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(*password), bcrypt.DefaultCost)
+	if err != nil {
+		return 0, fmt.Errorf("failed to hash password: %v", err)
+	}
 
 	stmt, err := s.DB.Prepare("INSERT INTO users(username, email, password) VALUES (?, ?, ?)")
 	if err != nil {
 		return 0, err
 	}
-	res, err := stmt.Exec(*username, *email, *password)
+	res, err := stmt.Exec(*username, *email, string(hashedPassword))
 	stmt.Close()
 	if err != nil {
 		return 0, err
@@ -77,8 +82,7 @@ func (s *Sqlite) Login(email *string, password *string) (int64, error) {
 		return 0, fmt.Errorf("email and password must not be nil")
 	}
 
-	// we will get the password for the user
-	// if we only have one user we can use queryRow instead of prepare and exec
+	// Fetch user by email
 	row := s.DB.QueryRow("SELECT id, password FROM users WHERE email = ?", *email)
 
 	var id int64
@@ -92,13 +96,11 @@ func (s *Sqlite) Login(email *string, password *string) (int64, error) {
 		return 0, err
 	}
 
-	fmt.Println("User ID:", id)
-	fmt.Println("Password:", dbPassword)
-
-	if dbPassword != *password {
+	// Compare the provided password with the stored hashed password
+	err = bcrypt.CompareHashAndPassword([]byte(dbPassword), []byte(*password))
+	if err != nil {
 		return 0, fmt.Errorf("wrong password entered")
 	}
 
 	return id, nil
-
 }
