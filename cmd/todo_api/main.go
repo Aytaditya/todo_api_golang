@@ -8,6 +8,7 @@ import (
 
 	"github.com/Aytaditya/todo_api_golang/internal/config"
 	"github.com/Aytaditya/todo_api_golang/internal/http/auth"
+	todo "github.com/Aytaditya/todo_api_golang/internal/http/handlers"
 	"github.com/Aytaditya/todo_api_golang/internal/storage/sqlite"
 )
 
@@ -35,7 +36,9 @@ func main() {
 	router.HandleFunc("POST /api/login", auth.Login(storage))
 
 	// NOTES ROUTES
-	// creating notes route
+	router.HandleFunc("POST /api/notes", todo.CreateTodo(storage))
+
+	// NOTES ROUTES
 	// view all notes of a user
 	// update a note
 	// delete a note

@@ -117,3 +117,23 @@ func (s *Sqlite) Login(email *string, password *string) (int64, string, error) {
 
 	return id, token, nil
 }
+
+func (s *Sqlite) CreatingTodo(userId *int64, title *string, content *string, tag *string) (int64, error) {
+	if userId == nil || title == nil {
+		return 0, fmt.Errorf("userId and title must not be nil")
+	}
+	stmt, err := s.DB.Prepare("INSERT INTO notes(user_id, title, content, tag) VALUES (?, ?, ?, ?)")
+	if err != nil {
+		return 0, err
+	}
+	res, err := stmt.Exec(*userId, *title, *content, *tag)
+	stmt.Close()
+	if err != nil {
+		return 0, err
+	}
+	id, err := res.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}
