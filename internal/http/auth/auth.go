@@ -32,14 +32,14 @@ func Signup(storage *sqlite.Sqlite) http.HandlerFunc {
 
 		fmt.Println(details)
 
-		id, er := storage.CreateUser(&details.Username, &details.Email, &details.Password)
+		id, token, er := storage.CreateUser(&details.Username, &details.Email, &details.Password)
 		if er != nil {
 			fmt.Println("Error creating user:", er)
 			response.WriteJson(w, http.StatusInternalServerError, map[string]string{"error": er.Error()})
 			return
 		}
 
-		response.WriteJson(w, http.StatusOK, map[string]string{"message": "User created successfully", "user_id": fmt.Sprint(id)})
+		response.WriteJson(w, http.StatusOK, map[string]string{"message": "User created successfully", "user_id": fmt.Sprint(id), "token": token})
 
 	}
 }
@@ -61,13 +61,13 @@ func Login(storage *sqlite.Sqlite) http.HandlerFunc {
 		fmt.Println(details)
 
 		// now we will verify the credentials
-		id, er := storage.Login(&details.Email, &details.Password)
+		id, token, er := storage.Login(&details.Email, &details.Password)
 		if er != nil {
 			response.WriteJson(w, http.StatusUnauthorized, map[string]string{"error": er.Error()})
 			return
 		}
 
-		response.WriteJson(w, http.StatusOK, map[string]string{"message": "User logged in Sucessfully", "user_id": fmt.Sprint(id)})
+		response.WriteJson(w, http.StatusOK, map[string]string{"message": "User logged in Sucessfully", "user_id": fmt.Sprint(id), "token": token})
 
 	}
 }
