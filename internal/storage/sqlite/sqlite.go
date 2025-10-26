@@ -6,6 +6,7 @@ import (
 
 	"github.com/Aytaditya/todo_api_golang/internal/config"
 	"github.com/Aytaditya/todo_api_golang/internal/middleware/jwt"
+	"github.com/Aytaditya/todo_api_golang/internal/types"
 	_ "github.com/mattn/go-sqlite3"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -136,4 +137,57 @@ func (s *Sqlite) CreatingTodo(userId *int64, title *string, content *string, tag
 		return 0, err
 	}
 	return id, nil
+}
+
+func (s *Sqlite) ViewAllTodos(userId *int64) ([]types.ReturnTodo, error) {
+	if userId == nil {
+		return nil, fmt.Errorf("userId must not be nil")
+	}
+
+	rows, err := s.DB.Query("SELECT id, title, content, tag FROM notes WHERE user_id = ?", *userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var todos []types.ReturnTodo // slice to hold all todos
+	for rows.Next() {
+		var todo types.ReturnTodo
+		err := rows.Scan(&todo.Id, &todo.Title, &todo.Content, &todo.Tag) // this should be in the same order as in select query
+		if err != nil {
+			return nil, err
+		}
+		todos = append(todos, todo)
+	}
+	return todos, nil
+}
+
+func (s *Sqlite) UpdateTodo(todoId *int64, title *string, content *string, tag *string) error {
+	if todoId == nil {
+		return fmt.Errorf("todoId must not be nil")
+	}
+	stmt, err := s.DB.Prepare("UPDATE notes SET title=?, content=?, tag=? WHERE id=?")
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(*title, *content, *tag, *todoId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *Sqlite) DeleteNote(todoId *int64) error {
+	if todoId == nil {
+		return fmt.Errorf("todoId must not be nil")
+	}
+
+	// For DELETE, INSERT, or UPDATE, you should use Exec
+
+	_, err := s.DB.Exec("DELETE FROM notes WHERE id = ?", *todoId)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

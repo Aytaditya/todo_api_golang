@@ -37,11 +37,9 @@ func main() {
 
 	// NOTES ROUTES
 	router.HandleFunc("POST /api/notes", todo.CreateTodo(storage))
-
-	// NOTES ROUTES
-	// view all notes of a user
-	// update a note
-	// delete a note
+	router.HandleFunc("GET /api/notes", todo.ViewAllTodo(storage))
+	router.HandleFunc("PUT /api/update-note/{id}", todo.UpdateTodo(storage))
+	router.HandleFunc("DELETE /api/delete-note/{id}", todo.DeleteNote(storage))
 
 	// http.Server is a struct that represents an HTTP server. here we are creating an instance of http.Server with the specified address and handler (router).
 	// but we can also create a server using http.ListenAndServe directly without creating an instance of http.Server.

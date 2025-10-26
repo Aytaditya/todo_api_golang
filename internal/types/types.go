@@ -26,3 +26,10 @@ type CreateTodo struct {
 	Content string `json:"content"`
 	Tag     string `json:"tag"`
 }
+
+type ReturnTodo struct {
+	Id      int64  `json:"id"`
+	Title   string `json:"title"`
+	Content string `json:"content"`
+	Tag     string `json:"tag"`
+}
