@@ -1,5 +1,5 @@
 
-# Todo & Notes API 
+# Todo & Notes API
 
 A **RESTful API** built in **Go** that allows users to create, read, update, and delete **Todos/Notes**. The project uses **SQLite** for storage and implements **JWT-based authentication** for secure, protected routes.  
 
@@ -160,7 +160,6 @@ jwt_secret: "SUPER_SECRET_KEY_CHANGE_THIS"
 * `env` → environment type (local, dev, prod)
 * `storage_path` → path to SQLite database file
 * `http_server.addr` → server address and port
-* `jwt_secret` → secret key used to sign JWT tokens
 
 The project uses the [cleanenv](https://github.com/ilyakaznacheev/cleanenv) Go package to **load and validate configuration** at runtime.
 
@@ -172,8 +171,8 @@ The project uses the [cleanenv](https://github.com/ilyakaznacheev/cleanenv) Go p
 2. Clone the repository:
 
 ```bash
-git clone <your-repo-url>
-cd project-root
+git clone https://github.com/Aytaditya/todo_api_golang.git
+cd todo_api_golang
 ```
 
 3. Install dependencies:
@@ -204,4 +203,3 @@ go run main.go --config config/prod.yaml
 ```
 
 ---
-
